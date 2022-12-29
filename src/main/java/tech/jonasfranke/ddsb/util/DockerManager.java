@@ -15,6 +15,7 @@ import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class DockerManager {
 
@@ -68,9 +69,6 @@ public class DockerManager {
 
         assert dockerClient != null;
         List<Container> containers = dockerClient.listContainersCmd().exec();
-        containers.forEach(container -> {
-            logger.info(container.toString());
-        });
         containerNames.addAll(containers);
         for (Container container : containers) {
             InspectContainerResponse containerInfo = dockerClient.inspectContainerCmd(container.getId()).exec();
@@ -79,13 +77,18 @@ public class DockerManager {
             SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
             Date startTimeDate = isoFormat.parse(startTimeString);
+            Calendar cal = Calendar.getInstance();
+            TimeZone tz = cal.getTimeZone();
+            logger.debug("Timezone: " + tz.getDisplayName() + " : " + tz.getRawOffset());
+            startTimeDate.setTime(startTimeDate.getTime() + TimeUnit.HOURS.toMillis(tz.getRawOffset()));
 
             Calendar startTime = Calendar.getInstance();
             startTime.setTime(startTimeDate);
 
-            Calendar currentTime = Calendar.getInstance();
+            Calendar now = Calendar.getInstance();
 
-            long uptimeMillis = currentTime.getTimeInMillis() - startTime.getTimeInMillis();
+            long uptimeMillis = now.getTimeInMillis() - startTime.getTimeInMillis();
+            logger.debug("System time: " + System.currentTimeMillis() + " Start time: " + startTime.getTimeInMillis() + " Now: " + now.getTimeInMillis());
 
             long uptimeSeconds = uptimeMillis / 1000;
             logger.info(container.getNames()[0] + ": Uptime: " + uptimeSeconds + " Sekunden");
@@ -105,7 +108,7 @@ public class DockerManager {
 
         for (Container containerName : containerNames) {
             builder
-                .addField(containerName.getNames()[0], containers.get(containerName.getId()), false);
+                .addField(containerName.getNames()[0].replaceFirst("/", ""), containers.get(containerName.getId()), false);
         }
         return builder.build();
     }

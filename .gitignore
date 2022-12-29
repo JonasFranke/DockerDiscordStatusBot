@@ -15,4 +15,7 @@
 *.iws
 *.ipr
 
+.gradle/*
 .gradle/
+build/*
+build/
