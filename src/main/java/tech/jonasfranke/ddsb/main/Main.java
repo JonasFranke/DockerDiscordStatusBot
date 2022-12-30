@@ -10,6 +10,7 @@ import discord4j.core.spec.MessageCreateSpec;
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.jonasfranke.ddsb.util.CustomEmote;
 import tech.jonasfranke.ddsb.util.DockerManager;
 
 import java.io.IOException;
@@ -36,11 +37,7 @@ public class Main {
                     break;
                 }
                 case "just a second..." -> {
-                    try {
-                        event.getMessage().getChannel().block().createMessage(MessageCreateSpec.builder().addEmbed(new DockerManager().createDockerEmbed()).build()).block();
-                    } catch (IOException | InterruptedException | ParseException e) {
-                        throw new RuntimeException(e);
-                    }
+                    event.getMessage().getChannel().block().createMessage(MessageCreateSpec.builder().addEmbed(new DockerManager().createDockerEmbed()).build()).block();
                 }
                 default -> {
                     if (!message.getContent().equals(" "))

@@ -11,26 +11,20 @@ import discord4j.rest.util.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class DockerManager {
 
     private final ArrayList<Container> containerNames = new ArrayList<>();
 
     /// Map contains the container id as key and the container uptime as value
-    private final HashMap<String, String> containers = new HashMap<>();
-    private final DockerClientConfig standard;
+    private final HashMap<String, String> containerUptime = new HashMap<>();
+    /// Map contains the container id as key and the container start time as value
+    private final HashMap<String, Long> containerUptimeRelative = new HashMap<>();
     private final Logger logger = LoggerFactory.getLogger(DockerManager.class);
 
-    public DockerManager() {
-        standard = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
-    }
-
-    public void handleDocker() throws IOException, InterruptedException, ParseException {
+    public void handleDocker() {
         /*Process p = Runtime.getRuntime().exec("docker ps");
         InputStream is = p.getInputStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -74,30 +68,24 @@ public class DockerManager {
             InspectContainerResponse containerInfo = dockerClient.inspectContainerCmd(container.getId()).exec();
 
             String startTimeString = containerInfo.getState().getStartedAt();
-            SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-
-            Date startTimeDate = isoFormat.parse(startTimeString);
-            Calendar cal = Calendar.getInstance();
-            TimeZone tz = cal.getTimeZone();
-            logger.debug("Timezone: " + tz.getDisplayName() + " : " + tz.getRawOffset());
-            startTimeDate.setTime(startTimeDate.getTime() + TimeUnit.HOURS.toMillis(tz.getRawOffset()));
-
-            Calendar startTime = Calendar.getInstance();
-            startTime.setTime(startTimeDate);
+            //2022-12-30T18:56:20.820972774Z
+            assert startTimeString != null;
+            long startTime = OffsetDateTime.parse(startTimeString).toInstant().toEpochMilli();
 
             Calendar now = Calendar.getInstance();
 
-            long uptimeMillis = now.getTimeInMillis() - startTime.getTimeInMillis();
-            logger.debug("System time: " + System.currentTimeMillis() + " Start time: " + startTime.getTimeInMillis() + " Now: " + now.getTimeInMillis());
+            long uptimeMillis = now.getTimeInMillis() - startTime;
+            logger.debug("Start time: " + startTime + " Now: " + now.getTimeInMillis());
 
             long uptimeSeconds = uptimeMillis / 1000;
             logger.info(container.getNames()[0] + ": Uptime: " + uptimeSeconds + " Sekunden");
-            this.containers.put(container.getId(), String.valueOf(uptimeSeconds));
+            this.containerUptime.put(container.getId(), String.valueOf(uptimeSeconds));
+            this.containerUptimeRelative.put(container.getId(), startTime / 1000);// Discord mag keine millisekunden
             logger.info(container.getId());
         }
     }
 
-    public EmbedCreateSpec createDockerEmbed() throws IOException, InterruptedException, ParseException {
+    public EmbedCreateSpec createDockerEmbed() {
         handleDocker();
         EmbedCreateSpec.Builder builder = EmbedCreateSpec.builder()
             .color(Color.BLUE)
@@ -108,7 +96,7 @@ public class DockerManager {
 
         for (Container containerName : containerNames) {
             builder
-                .addField(containerName.getNames()[0].replaceFirst("/", ""), containers.get(containerName.getId()), false);
+                .addField(CustomEmote.GreenUpArrow.getFullString() + " " + containerName.getNames()[0].replaceFirst("/", ""), containerUptime.get(containerName.getId()) + "s / <t:" + containerUptimeRelative.get(containerName.getId()) + ":R>", false);
         }
         return builder.build();
     }
