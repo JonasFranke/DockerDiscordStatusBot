@@ -89,15 +89,6 @@ public class Main {
             }
         }).subscribe();
 
-        /*ApplicationCommandRequest pingPongCommand = ApplicationCommandRequest.builder()
-                .name("ping")
-                .description("Replies with Pong!")
-                .build();
-        ApplicationCommandRequest dockerStatusCommand = ApplicationCommandRequest.builder()
-                .name("ds")
-                .description("Runs docker ps")
-                .build();*/
-
         List<String> commands = List.of("stopupdating.json", "ds.json", "ping.json");
 
         try {
