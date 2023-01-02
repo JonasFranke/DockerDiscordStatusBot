@@ -1,0 +1,35 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete old data in /tmp
+        run: rm -rf /tmp/ddsb*
+      - uses: actions/checkout@v3
+      - run: npm install @types/node --save-dev
+      - name: Compile TypeScript
+        run: tsc
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag ddsb:$(date +%s)
+      - name: Save to /tmp/
+        run: docker save ddsb -o /tmp/ddsb
+
+      - name: Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "/tmp/ddsb"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: true
+          tag: v1.1.${{ github.run_number }}
+
+      - uses: actions/upload-artifact@master
+        with:
+          name: ddsb
+          path: /tmp/ddsb
