@@ -23,6 +23,8 @@ jobs:
         uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
       - name: Build with Gradle
         run: sudo chmod +x gradlew && ./gradlew build
+      - name: remove old builds
+        run: rm -rf build/libs/*.jar
       - name: Compile code
         run: ./gradlew shadowJar
       - name: Build the Docker image
