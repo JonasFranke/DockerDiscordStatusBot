@@ -26,7 +26,7 @@ public class Main {
 
     public static void main(String[] args) {
         printStartupMessage();
-        final String token = "MTA1NzY2OTA4MjExMzExNDIyMw.GxQmTY.g1AvsWIO2_XQV2xhzhOKHrErNHceg3VkZw68SY";
+        final String token = System.getenv("DISCORD_TOKEN");
         final DiscordClient client = DiscordClient.create(token);
         final GatewayDiscordClient gateway = client.login().block();
         final long applicationId = client.getApplicationId().block();
