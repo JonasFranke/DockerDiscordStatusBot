@@ -8,3 +8,8 @@ A simple Discord bot that allows you to see the status of any docker container.
 - Build a jar using ```gradle shadowJar```
 - Build a docker image using ```docker build -t <image name> .```
 - Run the docker image using ```docker run -v //var/run/docker.sock:/var/run/docker.sock --network=host --name ddsb <image name>```
+
+- Add the bot to your server
+- Use the ```/ds``` command to see all running containers
+- Use the ```/stopupdating <TRUE/FALSE>``` command to stop the bot from updating the status
+
