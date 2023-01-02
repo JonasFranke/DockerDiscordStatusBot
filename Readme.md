@@ -1,6 +1,7 @@
 [![wakatime](https://wakatime.com/badge/user/49ee5b93-5588-4f44-a2a6-bceec1836f4a/project/11927978-fe31-424f-8dc8-e6278c354e31.svg)](https://wakatime.com/badge/user/49ee5b93-5588-4f44-a2a6-bceec1836f4a/project/11927978-fe31-424f-8dc8-e6278c354e31) [![Docker Image CI](https://github.com/JonasFranke/DockerDiscordStatusBot/actions/workflows/docker-build.yml/badge.svg)](https://github.com/JonasFranke/DockerDiscordStatusBot/actions/workflows/docker-build.yml)
 # DockerDiscordStatusBot
 A simple Discord bot that allows you to see the status of any docker container.
+View the DockerHub page [here](https://hub.docker.com/r/jnsfrnk/ddsb).
 
 ---
 ### How to use
