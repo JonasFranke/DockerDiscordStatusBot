@@ -6,11 +6,13 @@ import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.DockerClientConfig;
+import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
 import java.util.*;
 
@@ -25,28 +27,6 @@ public class DockerManager {
     private final Logger logger = LoggerFactory.getLogger(DockerManager.class);
 
     public void handleDocker() {
-        /*Process p = Runtime.getRuntime().exec("docker ps");
-        InputStream is = p.getInputStream();
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        String line;
-        while ((line = br.readLine()) != null) {
-            if (!line.toUpperCase().startsWith("CONTAINER")) {
-                ArrayList<String> out = new ArrayList<>();
-                for (String s : line.split(" ")) {
-                    if (!s.isEmpty()) {
-                        out.add(s);
-
-                    }
-                }
-                System.out.println(line);
-                containerNames.add(out.get(1));
-                containers.put(out.get(1), "Uptime: " + out.get(7) + " " + out.get(8));
-            }
-        }
-
-        p.waitFor();
-        return "Done";*/
-
         DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .withDockerHost("unix:///var/run/docker.sock")
                 .withDockerTlsVerify(false)
@@ -96,8 +76,14 @@ public class DockerManager {
 
         for (Container containerName : containerNames) {
             builder
-                .addField(CustomEmote.GreenUpArrow.getFullString() + " " + containerName.getNames()[0].replaceFirst("/", ""), containerUptime.get(containerName.getId()) + "s / <t:" + containerUptimeRelative.get(containerName.getId()) + ":R>", false);
+                .addField(CustomEmote.GreenUpArrow.getFullString() + " " + containerName.getNames()[0].replaceFirst("/", ""), /*containerUptime.get(containerName.getId()) +*/ "<t:" + containerUptimeRelative.get(containerName.getId()) + ":R>", false);
         }
+
+        Calendar now = Calendar.getInstance();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        builder
+                .footer("Last updated: " + formatter.format(now.getTime()), null);
+
         return builder.build();
     }
 }

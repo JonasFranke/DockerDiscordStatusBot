@@ -3,7 +3,6 @@ package tech.jonasfranke.ddsb.util;
 public enum CustomEmote {
     GreenUpArrow("GreenUpArrow", "1058388762121490542");// Adding a \ in front of the emote such as \:Dog_Spin: will display the name along with the ID such as  <a:Dog_Spin:801604978040897568>
 
-
     private final String id;
     private final String fullString;
     private final String name;

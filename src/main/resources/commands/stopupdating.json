@@ -1,0 +1,12 @@
+{
+  "name": "stopupdate",
+  "description": "Stop update",
+  "options": [
+    {
+      "name": "stop",
+      "description": "Stop",
+      "type": 5,
+      "required": true
+    }
+  ]
+}
