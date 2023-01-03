@@ -9,7 +9,6 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.MessageCreateSpec;
-import discord4j.discordjson.json.ApplicationCommandRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.jonasfranke.ddsb.util.DockerManager;
@@ -23,13 +22,15 @@ public class Main {
 
     private static Logger logger = LoggerFactory.getLogger(Main.class);
     private static boolean cancelThreads = false;
+    private static DiscordClient client;
+    private static GatewayDiscordClient gateway;
 
     public static void main(String[] args) {
         printStartupMessage();
         final String token = System.getenv("DISCORD_TOKEN");
         logger.debug("Using token: " + token);
-        final DiscordClient client = DiscordClient.create(token);
-        final GatewayDiscordClient gateway = client.login().block();
+        client = DiscordClient.create(token);
+        gateway = client.login().block();
         final long applicationId = client.getApplicationId().block();
         /// Map contains the message id as key and the channel id as value
         final HashMap<Snowflake, Snowflake> messageIds = new HashMap<>();
@@ -45,9 +46,9 @@ public class Main {
                 }
                 case "just a second..." -> {
                     if (message.getAuthor().isPresent() && message.getAuthor().get().isBot()) {
-                        final Message embed = event.getMessage().getChannel().block().createMessage(MessageCreateSpec.builder().addEmbed(new DockerManager().createDockerEmbed()).build()).block();
+                        final Message embed = event.getMessage().getChannel().block().createMessage(MessageCreateSpec.builder().addEmbed(new DockerManager().createDockerEmbed(message.getGuildId().get())).build()).block();
                         messageIds.put(embed.getId(), embed.getChannelId());
-                        UpdateEmbedThread thread = new UpdateEmbedThread(client, embed.getId(), messageIds);
+                        UpdateEmbedThread thread = new UpdateEmbedThread(client, embed.getId(), messageIds, message.getGuildId().get());
                         cancelThreads = false;
                         thread.start();
                     }
@@ -121,5 +122,13 @@ public class Main {
 
     public static boolean isCancelThreads() {
         return cancelThreads;
+    }
+
+    public static DiscordClient getClient() {
+        return client;
+    }
+
+    public static GatewayDiscordClient getGateway() {
+        return gateway;
     }
 }

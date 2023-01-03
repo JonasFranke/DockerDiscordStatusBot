@@ -6,11 +6,12 @@ import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.DockerClientConfig;
-import discord4j.core.object.Embed;
+import discord4j.common.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.jonasfranke.ddsb.main.Main;
 
 import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
@@ -65,7 +66,7 @@ public class DockerManager {
         }
     }
 
-    public EmbedCreateSpec createDockerEmbed() {
+    public EmbedCreateSpec createDockerEmbed(Snowflake guildID) {
         handleDocker();
         EmbedCreateSpec.Builder builder = EmbedCreateSpec.builder()
             .color(Color.BLUE)
@@ -76,7 +77,7 @@ public class DockerManager {
 
         for (Container containerName : containerNames) {
             builder
-                .addField(CustomEmote.GreenUpArrow.getFullString() + " " + containerName.getNames()[0].replaceFirst("/", ""), /*containerUptime.get(containerName.getId()) +*/ "<t:" + containerUptimeRelative.get(containerName.getId()) + ":R>", false);
+                .addField(CustomEmote.GreenUpArrow.getFullStringOrAlias(guildID, Main.getGateway()) + " " + containerName.getNames()[0].replaceFirst("/", ""), /*containerUptime.get(containerName.getId()) +*/ "<t:" + containerUptimeRelative.get(containerName.getId()) + ":R>", false);
         }
 
         Calendar now = Calendar.getInstance();

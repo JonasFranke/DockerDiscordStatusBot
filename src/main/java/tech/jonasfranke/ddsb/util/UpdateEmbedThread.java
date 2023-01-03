@@ -18,11 +18,13 @@ public class UpdateEmbedThread extends Thread {
     private final DiscordClient client;
     private final HashMap<Snowflake, Snowflake> messageIds;
     private final Snowflake id;
+    private final Snowflake guildId;
 
-    public UpdateEmbedThread(DiscordClient client, Snowflake id, HashMap<Snowflake, Snowflake> messageIds) {
+    public UpdateEmbedThread(DiscordClient client, Snowflake id, HashMap<Snowflake, Snowflake> messageIds, Snowflake guildId) {
         this.messageIds = messageIds;
         this.client = client;
         this.id = id;
+        this.guildId = guildId;
     }
 
     @Override
@@ -37,7 +39,7 @@ public class UpdateEmbedThread extends Thread {
             RestChannel channel = client.getChannelById(messageIds.get(id));
 
             RestMessage message = channel.getRestMessage(id);
-            message.edit(MessageEditRequest.builder().addEmbed(new DockerManager().createDockerEmbed().asRequest()).build()).block();
+            message.edit(MessageEditRequest.builder().addEmbed(new DockerManager().createDockerEmbed(guildId).asRequest()).build()).block();
             logger.info("Updated message " + id.asString());
         }
         logger.info("Stopping thread for message " + id.asString());
