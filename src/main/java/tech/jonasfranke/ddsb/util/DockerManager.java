@@ -77,7 +77,7 @@ public class DockerManager {
 
         for (Container containerName : containerNames) {
             builder
-                .addField(CustomEmote.GreenUpArrow.getFullStringOrAlias(guildID, Main.getGateway()) + " " + containerName.getNames()[0].replaceFirst("/", ""), /*containerUptime.get(containerName.getId()) +*/ "<t:" + containerUptimeRelative.get(containerName.getId()) + ":R>", false);
+                .addField(CustomEmote.GreenUpArrow.init(guildID, Main.getGateway()).getFullStringOrAlias() + " " + containerName.getNames()[0].replaceFirst("/", ""), /*containerUptime.get(containerName.getId()) +*/ "<t:" + containerUptimeRelative.get(containerName.getId()) + ":R>", false);
         }
 
         Calendar now = Calendar.getInstance();
