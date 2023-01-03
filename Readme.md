@@ -1,5 +1,6 @@
 [![wakatime](https://wakatime.com/badge/user/49ee5b93-5588-4f44-a2a6-bceec1836f4a/project/11927978-fe31-424f-8dc8-e6278c354e31.svg)](https://wakatime.com/badge/user/49ee5b93-5588-4f44-a2a6-bceec1836f4a/project/11927978-fe31-424f-8dc8-e6278c354e31) [![Docker Image CI](https://github.com/JonasFranke/DockerDiscordStatusBot/actions/workflows/docker-build.yml/badge.svg)](https://github.com/JonasFranke/DockerDiscordStatusBot/actions/workflows/docker-build.yml)
 # ⚠️ DISCLAIMER: Mounting the docker socket into the container is a security risk. If you don't know what you are doing, don't do it. ⚠️
+Mounting the docker socket into a container gives that container full access to the Docker daemon and its capabilities. This includes the ability to run any other containers or images, access the network, and access any host file system that is mapped into the container. Essentially, it allows the container to have complete control over the host system. This can be a serious security risk if the container is compromised or if an attacker is able to gain access to the container.
 # DockerDiscordStatusBot
 A simple Discord bot that allows you to see the status of any docker container.
 View the DockerHub page [here](https://hub.docker.com/r/jnsfrnk/ddsb).
