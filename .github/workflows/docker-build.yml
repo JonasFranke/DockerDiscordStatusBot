@@ -10,8 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Delete old data in /tmp
-        run: rm -rf /tmp/ddsb*
       - uses: actions/checkout@v3
       - name: Set up JDK 17
         uses: actions/setup-java@v3.9.0
