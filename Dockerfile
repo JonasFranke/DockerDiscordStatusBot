@@ -1,4 +1,4 @@
-FROM openjdk:17
+FROM openjdk:8-jdk-alpine-arm32v7
 RUN cp /usr/share/zoneinfo/Europe/Berlin /etc/localtime
 RUN mkdir /app
 COPY build/libs/*.jar /app/app.jar
