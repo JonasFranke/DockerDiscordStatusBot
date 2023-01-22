@@ -39,12 +39,12 @@ public class Main {
         gateway.on(MessageCreateEvent.class).subscribe(event -> {
             final Message message = event.getMessage();
             switch (message.getContent().toLowerCase()) {
-                case "!ping" -> {
+                case "!ping":
                     final MessageChannel channel = message.getChannel().block();
                     assert channel != null;
                     channel.createMessage("Pong!").block();
-                }
-                case "just a second..." -> {
+
+                case "just a second...":
                     if (message.getAuthor().isPresent() && message.getAuthor().get().isBot()) {
                         final Message embed = event.getMessage().getChannel().block().createMessage(MessageCreateSpec.builder().addEmbed(new DockerManager().createDockerEmbed(message.getGuildId().get())).build()).block();
                         messageIds.put(embed.getId(), embed.getChannelId());
@@ -53,23 +53,23 @@ public class Main {
                         thread.start();
                     }
 
-                }
-                default -> {
+
+                default:
                     if (!message.getContent().equals(" "))
                         logger.info("Message received: " + message.getContent());
-                }
+
             }
         });
 
         gateway.on(ChatInputInteractionEvent.class, event -> {
             switch (event.getCommandName()) {
-                case "ping" -> {
+                case "ping":
                     return event.reply("Pong!");
-                }
-                case "ds" -> {
+
+                case "ds":
                     return event.reply("Just a second...");
-                }
-                case "stopupdate" -> {
+
+                case "stopupdate":
                     if (event.getOption("stop").isPresent() && event.getOption("stop").get().getValue().get().asBoolean()) {
                         cancelThreads = true;
                         logger.info("Set cancelThreads to " + true);
@@ -84,10 +84,8 @@ public class Main {
                                 .withEphemeral(true);
                     }
 
-                }
-                default -> {
+                default:
                     return null;
-                }
             }
         }).subscribe();
 
