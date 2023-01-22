@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "armv7" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "armv7" ]
 
 jobs:
   build:
@@ -38,4 +38,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/ddsb:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/ddsb:armv7
