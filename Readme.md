@@ -12,6 +12,10 @@ View the DockerHub page [here](https://hub.docker.com/r/jnsfrnk/ddsb).
 - Build a docker image using ```docker build -t <image name> .```
 - Run the docker image using ```docker run -v //var/run/docker.sock:/var/run/docker.sock --network=host --name ddsb -e DISCORD_TOKEN=<YOUR-DISCORD-BOT-TOKEN> <image name>```
 
+#### Using the pre-built image:
+- Clone the image from DockerHub using ```docker pull jnsfrnk/ddsb:latest```
+- Run the docker image using ```docker run -v //var/run/docker.sock:/var/run/docker.sock --network=host --name ddsb -e DISCORD_TOKEN=<YOUR-DISCORD-BOT-TOKEN> jnsfrnk/ddsb:latest```
+
 - Add the bot to your server
 - Use the ```/ds``` command to see all running containers
 - Use the ```/stopupdating <TRUE/FALSE>``` command to stop the bot from updating the status
