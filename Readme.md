@@ -10,9 +10,14 @@ View the DockerHub page [here](https://hub.docker.com/r/jnsfrnk/ddsb).
 
 ---
 ### How to use
+#### Compiling it yourself:
 - Clone the repository
 - Build a jar using ```gradle shadowJar```
 - Build a docker image using ```docker build -t <image name> .```
+- Run the docker image using ```docker run -v //var/run/docker.sock:/var/run/docker.sock --network=host --name ddsb -e DISCORD_TOKEN=<YOUR-DISCORD-BOT-TOKEN> <image name>```
+
+#### Using the pre-built image:
+- Clone the image from DockerHub using ```docker pull jnsfrnk/ddsb:armv7```
 - Run the docker image using ```docker run -v //var/run/docker.sock:/var/run/docker.sock --network=host --name ddsb -e DISCORD_TOKEN=<YOUR-DISCORD-BOT-TOKEN> <image name>```
 
 - Add the bot to your server
