@@ -1,4 +1,4 @@
-FROM eclipse-temurin:19-alpine
+FROM eclipse-temurin:latest
 
 COPY build/libs/*.jar /app.jar
 WORKDIR /
