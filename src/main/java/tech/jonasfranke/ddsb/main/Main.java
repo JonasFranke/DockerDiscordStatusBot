@@ -17,6 +17,7 @@ import tech.jonasfranke.ddsb.util.UpdateEmbedThread;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Main {
 
@@ -48,9 +49,21 @@ public class Main {
                     if (message.getAuthor().isPresent() && message.getAuthor().get().isBot()) {
                         final Message embed = event.getMessage().getChannel().block().createMessage(MessageCreateSpec.builder().addEmbed(new DockerManager().createDockerEmbed(message.getGuildId().get())).build()).block();
                         messageIds.put(embed.getId(), embed.getChannelId());
-                        UpdateEmbedThread thread = new UpdateEmbedThread(client, embed.getId(), messageIds, message.getGuildId().get());
-                        cancelThreads = false;
-                        thread.start();
+                        if (!cancelThreads) {
+                            UpdateEmbedThread thread = new UpdateEmbedThread(client, embed.getId(), messageIds, message.getGuildId().get());
+                            if (messageIds.containsValue(message.getChannelId())) {
+                                thread.stopMessage(
+                                        messageIds.entrySet()
+                                                .stream()
+                                                .filter(entry -> entry.getValue().equals(message.getChannelId()))
+                                                .map(Map.Entry::getKey)
+                                                .findFirst()
+                                                .orElse(null)
+                                );
+                            }
+                            thread.addChannel(message.getChannelId());
+                            thread.start();
+                        }
                     }
 
                 }
@@ -95,8 +108,6 @@ public class Main {
 
         try {
             new GlobalCommandRegistrar(gateway.getRestClient()).registerCommands(commands);
-            //client.getApplicationService().createGlobalApplicationCommand(applicationId, pingPongCommand).subscribe();
-            //client.getApplicationService().createGlobalApplicationCommand(applicationId, dockerStatusCommand).subscribe();
         } catch (Exception e) {
             logger.error("Error trying to register global slash commands", e);
         }

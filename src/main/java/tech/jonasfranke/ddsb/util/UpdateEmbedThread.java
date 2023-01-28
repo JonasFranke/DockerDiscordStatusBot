@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.jonasfranke.ddsb.main.Main;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class UpdateEmbedThread extends Thread {
@@ -19,6 +20,8 @@ public class UpdateEmbedThread extends Thread {
     private final HashMap<Snowflake, Snowflake> messageIds;
     private final Snowflake id;
     private final Snowflake guildId;
+    private final ArrayList<Snowflake> runningChannels = new ArrayList<>();
+    private final ArrayList<Snowflake> stoppedMessages = new ArrayList<>();
 
     public UpdateEmbedThread(DiscordClient client, Snowflake id, HashMap<Snowflake, Snowflake> messageIds, Snowflake guildId) {
         this.messageIds = messageIds;
@@ -30,7 +33,11 @@ public class UpdateEmbedThread extends Thread {
     @Override
     public void run() {
         logger.info("Starting thread for message " + id.asString());
-        while (!Main.isCancelThreads()) {
+        if (runningChannels.contains(messageIds.get(id))) {
+            logger.info("Stopping thread for message " + id.asString() + " because channel is already running");
+            this.interrupt();
+        }
+        while (!Main.isCancelThreads() && !stoppedMessages.contains(id)) {
             try {
                 Thread.sleep(20*1000);
             } catch (InterruptedException e) {
@@ -43,6 +50,20 @@ public class UpdateEmbedThread extends Thread {
             logger.info("Updated message " + id.asString());
         }
         logger.info("Stopping thread for message " + id.asString());
+        removeChannel(messageIds.get(id));
         this.interrupt();
+    }
+
+    public void addChannel(Snowflake channelId) {
+        runningChannels.add(channelId);
+    }
+
+    public void removeChannel(Snowflake channelId) {
+        runningChannels.remove(channelId);
+    }
+
+    public void stopMessage(Snowflake messageId) {
+        if (messageId != null)
+            stoppedMessages.add(messageId);
     }
 }
