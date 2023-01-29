@@ -52,7 +52,7 @@ public class Main {
                             UpdateEmbedThread thread = new UpdateEmbedThread(client, embed.getId(), messageIds, message.getGuildId().get());
                             if (LatestMessageUpdater.hasRunningThread(embed.getChannelId())) {
                                 logger.debug("Detected that channel already has a thread running, stopping it now id: " + embed.getChannelId());
-                                LatestMessageUpdater.stopMessage(embed.getId(), embed.getChannelId());
+                                LatestMessageUpdater.stopMessage(embed.getId());
                             }
                             messageIds.put(embed.getId(), embed.getChannelId());
                             if (LatestMessageUpdater.addChannel(embed.getChannelId(), thread))
