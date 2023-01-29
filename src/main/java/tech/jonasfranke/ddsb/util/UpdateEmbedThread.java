@@ -63,7 +63,7 @@ public class UpdateEmbedThread extends Thread {
             logger.info("Updated message " + mId.asString());
 
         }
-        logger.info("Stopped thread for message " + mId.asString() + " " + (messageRunning ? "isMessageStopped is " + LatestMessageUpdater.isMessageStopped(mId) : "messageRunning is false"));
+        logger.info("Stopped thread for message " + mId.asString());
         LatestMessageUpdater.removeChannel(channel.getId());
         this.interrupt();
     }

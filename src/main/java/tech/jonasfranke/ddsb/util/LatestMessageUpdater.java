@@ -43,6 +43,10 @@ public class LatestMessageUpdater {
         return threads.containsKey(channelId);
     }
 
+    public static Snowflake getRunningThreadMessageId(Snowflake channelId) {
+        return Snowflake.of(threads.get(channelId).getName().split(" ")[2]); //Mir gehts miserabel
+    }
+
     public static void stopMessage(Snowflake messageId) {
         if (messageId != null) {
             try {
