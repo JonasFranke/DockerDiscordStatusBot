@@ -20,8 +20,6 @@ public class UpdateEmbedThread extends Thread {
     private final HashMap<Snowflake, Snowflake> messageIds;
     private final Snowflake id;
     private final Snowflake guildId;
-    private final ArrayList<Snowflake> runningChannels = new ArrayList<>();
-    private final ArrayList<Snowflake> stoppedMessages = new ArrayList<>();
 
     public UpdateEmbedThread(DiscordClient client, Snowflake id, HashMap<Snowflake, Snowflake> messageIds, Snowflake guildId) {
         this.messageIds = messageIds;
@@ -32,38 +30,41 @@ public class UpdateEmbedThread extends Thread {
 
     @Override
     public void run() {
-        logger.info("Starting thread for message " + id.asString());
-        if (runningChannels.contains(messageIds.get(id))) {
-            logger.info("Stopping thread for message " + id.asString() + " because channel is already running");
-            this.interrupt();
-        }
-        while (!Main.isCancelThreads() && !stoppedMessages.contains(id)) {
+        Snowflake mId = id;
+        logger.info("Starting thread for message " + mId.asString());
+        this.setName("MessageUpdatingThread for " + mId.asString());
+        RestChannel channel = client.getChannelById(messageIds.get(mId));
+        RestMessage message = channel.getRestMessage(mId);
+        boolean messageRunning = true;
+        while (true) {
+            logger.debug("Message with Id " + mId.asString() + " is running isCancelThreads " + Main.isCancelThreads() + " isMessageStopped " + LatestMessageUpdater.isMessageStopped(mId) + " messageRunning " + messageRunning); //TODO: remove this after tests
+            if (LatestMessageUpdater.isMessageStopped(mId)) {
+                logger.info("Stopping thread for message " + mId.asString() + " because channel is already running");
+                message.edit(MessageEditRequest.builder().addEmbed(new DockerManager().createDockerEmbed(guildId, false).asRequest()).build()).block();
+                messageRunning = false;
+                break;
+            }
+            if (!messageRunning) {
+                message.edit(MessageEditRequest.builder().addEmbed(new DockerManager().createDockerEmbed(guildId, false).asRequest()).build()).block();
+                break;
+            }
+            if (Main.isCancelThreads()) {
+                logger.info("Stopping thread for message " + mId.asString() + " because cancelThreads is " + Main.isCancelThreads());
+                message.edit(MessageEditRequest.builder().addEmbed(new DockerManager().createDockerEmbed(guildId, false).asRequest()).build()).block();
+                break;
+            }
             try {
                 Thread.sleep(20*1000);
             } catch (InterruptedException e) {
                 logger.error("Thread interrupted", e);
             }
-            RestChannel channel = client.getChannelById(messageIds.get(id));
 
-            RestMessage message = channel.getRestMessage(id);
-            message.edit(MessageEditRequest.builder().addEmbed(new DockerManager().createDockerEmbed(guildId).asRequest()).build()).block();
-            logger.info("Updated message " + id.asString());
+            message.edit(MessageEditRequest.builder().addEmbed(new DockerManager().createDockerEmbed(guildId, messageRunning).asRequest()).build()).block();
+            logger.info("Updated message " + mId.asString());
+
         }
-        logger.info("Stopping thread for message " + id.asString());
-        removeChannel(messageIds.get(id));
+        logger.info("Stopped thread for message " + mId.asString() + " " + (messageRunning ? "isMessageStopped is " + LatestMessageUpdater.isMessageStopped(mId) : "messageRunning is false"));
+        LatestMessageUpdater.removeChannel(channel.getId());
         this.interrupt();
-    }
-
-    public void addChannel(Snowflake channelId) {
-        runningChannels.add(channelId);
-    }
-
-    public void removeChannel(Snowflake channelId) {
-        runningChannels.remove(channelId);
-    }
-
-    public void stopMessage(Snowflake messageId) {
-        if (messageId != null)
-            stoppedMessages.add(messageId);
     }
 }
