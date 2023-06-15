@@ -37,13 +37,15 @@ jobs:
         id: setPushParameter
         run: |
           if [[ ${{ github.ref }} == 'refs/heads/master' ]]; then
-            echo "::set-output name=push::true"
+            echo "PUSH=true" >> $GITHUB_ENV
           else
-            echo "::set-output name=push::false"
+            echo "PUSH=false" >> $GITHUB_ENV
           fi
           
       - name: Build and push
-        if: ${{ steps.setPushParameter.outputs.push == 'true' }}
+        env:
+          PUSH: ${{ env.PUSH }}
+        if: ${{ env.PUSH == 'true' }}
         uses: docker/build-push-action@v3
         with:
           context: .
