@@ -55,4 +55,3 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_HUB_USERNAME }}/ddsb:dev
-            ${{ secrets.DOCKER_HUB_USERNAME }}/ddsb:$(date + '%Y%m%d%H%M%S')
