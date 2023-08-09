@@ -3,7 +3,6 @@ package tech.jonasfranke.ddsb.main;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
-import discord4j.core.event.domain.interaction.ApplicationCommandInteractionEvent;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
@@ -13,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.jonasfranke.ddsb.util.DockerManager;
 import tech.jonasfranke.ddsb.util.GlobalCommandRegistrar;
+import tech.jonasfranke.ddsb.util.LatestMessageUpdater;
 import tech.jonasfranke.ddsb.util.UpdateEmbedThread;
 
 import java.util.HashMap;
@@ -46,11 +46,19 @@ public class Main {
                 }
                 case "just a second..." -> {
                     if (message.getAuthor().isPresent() && message.getAuthor().get().isBot()) {
-                        final Message embed = event.getMessage().getChannel().block().createMessage(MessageCreateSpec.builder().addEmbed(new DockerManager().createDockerEmbed(message.getGuildId().get())).build()).block();
-                        messageIds.put(embed.getId(), embed.getChannelId());
-                        UpdateEmbedThread thread = new UpdateEmbedThread(client, embed.getId(), messageIds, message.getGuildId().get());
-                        cancelThreads = false;
-                        thread.start();
+                        final Message embed = event.getMessage().getChannel().block().createMessage(MessageCreateSpec.builder().addEmbed(new DockerManager().createDockerEmbed(message.getGuildId().get(), true)).build()).block();
+                        if (!cancelThreads) {
+                            assert embed != null;
+                            UpdateEmbedThread thread = new UpdateEmbedThread(client, embed.getId(), messageIds, message.getGuildId().get());
+                            if (LatestMessageUpdater.hasRunningThread(embed.getChannelId())) {
+                                logger.debug("Detected that channel already has a thread running, stopping it now id: " + embed.getChannelId());
+                                LatestMessageUpdater.stopMessage(LatestMessageUpdater.getRunningThreadMessageId(embed.getChannelId()));
+                            }
+                            messageIds.put(embed.getId(), embed.getChannelId());
+                            if (LatestMessageUpdater.addChannel(embed.getChannelId(), thread))
+                                thread.start();
+                            logger.debug("Requested new thread for channel id: " + embed.getChannelId().asString());
+                        }
                     }
 
                 }
@@ -95,8 +103,6 @@ public class Main {
 
         try {
             new GlobalCommandRegistrar(gateway.getRestClient()).registerCommands(commands);
-            //client.getApplicationService().createGlobalApplicationCommand(applicationId, pingPongCommand).subscribe();
-            //client.getApplicationService().createGlobalApplicationCommand(applicationId, dockerStatusCommand).subscribe();
         } catch (Exception e) {
             logger.error("Error trying to register global slash commands", e);
         }

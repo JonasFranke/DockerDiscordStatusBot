@@ -66,7 +66,7 @@ public class DockerManager {
         }
     }
 
-    public EmbedCreateSpec createDockerEmbed(Snowflake guildID) {
+    public EmbedCreateSpec createDockerEmbed(Snowflake guildID, boolean running) {
         handleDocker();
         EmbedCreateSpec.Builder builder = EmbedCreateSpec.builder()
             .color(Color.BLUE)
@@ -82,8 +82,11 @@ public class DockerManager {
 
         Calendar now = Calendar.getInstance();
         SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        builder
-                .footer("Last updated: " + formatter.format(now.getTime()), null);
+        if (running) {
+            builder.footer("Last updated: " + formatter.format(now.getTime()), null);
+        } else
+            builder.footer("Last updated: " + formatter.format(now.getTime()) + " (Stopped thread for updating this message)", null);
+
 
         return builder.build();
     }
