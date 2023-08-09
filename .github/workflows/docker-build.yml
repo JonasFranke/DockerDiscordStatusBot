@@ -47,7 +47,6 @@ jobs:
       - name: Build and push
         env:
           PUSH: ${{ env.PUSH }}
-        if: ${{ env.PUSH == 'true' }}
         uses: docker/build-push-action@v4
         with:
           context: .
