@@ -3,7 +3,7 @@ WORKDIR /app
 COPY . .
 RUN gradle clean shadowJar
 
-FROM eclipse-temurin:17-jammy
+FROM eclipse-temurin:17-jre-jammy
 
 WORKDIR /app
 RUN ls
