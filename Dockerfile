@@ -1,6 +1,12 @@
-FROM gradle:jdk17-jammy
+FROM gradle:jdk17-jammy AS build
 WORKDIR /app
-COPY build.gradle settings.gradle ./
-COPY src ./src
+COPY . .
 RUN gradle clean shadowJar
-ENTRYPOINT ["java", "-jar", "build/libs/ddsb-1.0-SNAPSHOT-all.jar"]
+
+FROM eclipse-temurin:17-jammy
+
+WORKDIR /app
+RUN ls
+COPY --from=build /app/build/libs/ddsb-*.jar bot.jar
+
+ENTRYPOINT ["java", "-jar", "bot.jar"]
