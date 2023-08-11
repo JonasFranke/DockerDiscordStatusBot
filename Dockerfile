@@ -1,6 +1,6 @@
-FROM openjdk:17.0.2
-RUN cp /usr/share/zoneinfo/Europe/Berlin /etc/localtime
-RUN mkdir /app
-COPY build/libs/*.jar /app/app.jar
+FROM gradle:jdk17-jammy
 WORKDIR /app
-CMD ["java", "-jar", "app.jar"]
+COPY build.gradle settings.gradle ./
+COPY src ./src
+RUN gradle clean shadowJar
+ENTRYPOINT ["java", "-jar", "build/libs/ddsb-1.0-SNAPSHOT-all.jar"]
