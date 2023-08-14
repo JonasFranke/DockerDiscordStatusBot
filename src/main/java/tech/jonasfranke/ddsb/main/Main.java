@@ -15,7 +15,6 @@ import tech.jonasfranke.ddsb.util.GlobalCommandRegistrar;
 import tech.jonasfranke.ddsb.util.LatestMessageUpdater;
 import tech.jonasfranke.ddsb.util.UpdateEmbedThread;
 
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 
