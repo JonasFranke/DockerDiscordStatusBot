@@ -15,6 +15,7 @@ import tech.jonasfranke.ddsb.util.GlobalCommandRegistrar;
 import tech.jonasfranke.ddsb.util.LatestMessageUpdater;
 import tech.jonasfranke.ddsb.util.UpdateEmbedThread;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,6 +23,7 @@ public class Main {
 
     private static Logger logger = LoggerFactory.getLogger(Main.class);
     private static boolean cancelThreads = false;
+    private static boolean noUpdate = false;
     private static DiscordClient client;
     private static GatewayDiscordClient gateway;
 
@@ -35,6 +37,15 @@ public class Main {
         /// Map contains the message id as key and the channel id as value
         final HashMap<Snowflake, Snowflake> messageIds = new HashMap<>();
 
+        if (System.getenv("NO_UPDATE") != null) {
+            if (System.getenv("NO_UPDATE").equalsIgnoreCase("true") || System.getenv("NO_UPDATE").equalsIgnoreCase("false")) {
+                noUpdate = Boolean.parseBoolean(System.getenv("NO_UPDATE"));
+                logger.info("NO_UPDATE is set to " + noUpdate);
+            } else {
+                throw new RuntimeException("Could not parse NO_UPDATE env variable");
+            }
+        }
+
         assert gateway != null;
         gateway.on(MessageCreateEvent.class).subscribe(event -> {
             final Message message = event.getMessage();
@@ -46,8 +57,8 @@ public class Main {
                 }
                 case "just a second..." -> {
                     if (message.getAuthor().isPresent() && message.getAuthor().get().isBot()) {
-                        final Message embed = event.getMessage().getChannel().block().createMessage(MessageCreateSpec.builder().addEmbed(new DockerManager().createDockerEmbed(message.getGuildId().get(), true)).build()).block();
-                        if (!cancelThreads) {
+                        final Message embed = event.getMessage().getChannel().block().createMessage(MessageCreateSpec.builder().addEmbed(new DockerManager().createDockerEmbed(message.getGuildId().get(), true, isNoUpdate())).build()).block();
+                        if (!cancelThreads && !isNoUpdate()) {
                             assert embed != null;
                             UpdateEmbedThread thread = new UpdateEmbedThread(client, embed.getId(), messageIds, message.getGuildId().get());
                             if (LatestMessageUpdater.hasRunningThread(embed.getChannelId())) {
@@ -132,6 +143,10 @@ public class Main {
 
     public static DiscordClient getClient() {
         return client;
+    }
+
+    public static boolean isNoUpdate() {
+        return noUpdate;
     }
 
     public static GatewayDiscordClient getGateway() {

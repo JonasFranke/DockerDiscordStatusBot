@@ -21,3 +21,11 @@ View the DockerHub page [here](https://hub.docker.com/r/jnsfrnk/ddsb).
 - Use the ```/ds``` command to see all running containers
 - Use the ```/stopupdating <TRUE/FALSE>``` command to stop the bot from updating the status
 
+---
+
+#### Environment variables
+
+| Name                | Default | Values                 |
+|---------------------|---------|------------------------|
+| ```DISCORD_TOKEN``` | none    | Your discord bot token |
+| ```NO_UPDATE```     | false   | true/false             |
