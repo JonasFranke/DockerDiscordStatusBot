@@ -90,4 +90,33 @@ public class DockerManager {
 
         return builder.build();
     }
+    public EmbedCreateSpec createDockerEmbed(Snowflake guildID, boolean running, boolean isNoUpdate) {
+        handleDocker();
+        EmbedCreateSpec.Builder builder = EmbedCreateSpec.builder()
+            .color(Color.BLUE)
+            .title("Docker Status")
+            .description("This is the status of the docker containers")
+            .addField("\u200B", "\u200B", false)
+            .addField("\u200B", "\u200B", false);
+
+        for (Container containerName : containerNames) {
+            builder
+                .addField(CustomEmote.GreenUpArrow.init(guildID, Main.getGateway()).getFullStringOrAlias() + " " + containerName.getNames()[0].replaceFirst("/", ""), /*containerUptime.get(containerName.getId()) +*/ "<t:" + containerUptimeRelative.get(containerName.getId()) + ":R>", false);
+        }
+
+        Calendar now = Calendar.getInstance();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        if (running) {
+            if (!isNoUpdate) {
+                builder.footer("Last updated: " + formatter.format(now.getTime()), null);
+            } else {
+                builder.footer("Last updated: " + formatter.format(now.getTime()) + " ❌ Update", null);
+            }
+
+        } else
+            builder.footer("Last updated: " + formatter.format(now.getTime()) + " (Stopped thread for updating this message)", null);
+
+
+        return builder.build();
+    }
 }
