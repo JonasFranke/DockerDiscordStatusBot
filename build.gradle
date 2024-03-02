@@ -19,7 +19,7 @@ dependencies {
     implementation 'com.discord4j:discord4j-core:3.2.6'
     implementation 'com.github.docker-java:docker-java:3.3.6'
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.12'
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.1'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.2'
 }
 
 test {
